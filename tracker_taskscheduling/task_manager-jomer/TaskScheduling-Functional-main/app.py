@@ -22,24 +22,28 @@ def execute_query(conn, query, params=(), commit=False):
 
 # Function to insert a new task
 def insert_task(conn, task_name, catID, date_time, priority):
+    # Pure Function: It takes input and returns a result without modifying external state.
     query = "INSERT INTO tasks (task_name, catID, date_time, priority) VALUES (?, ?, ?, ?)"
     params = (task_name, catID, date_time, priority)
     execute_query(conn, query, params, commit=True)
 
 # Function to update a task
 def update_task(conn, task_id, task_name, catID, date_time, priority):
+    # Pure Function: It takes input and returns a result without modifying external state.
     query = "UPDATE tasks SET task_name=?, catID=?, date_time=?, priority=? WHERE ID=?"
     params = (task_name, catID, date_time, priority, task_id)
     execute_query(conn, query, params, commit=True)
 
 # Function to delete a task
 def delete_task(conn, task_id):
+    # Pure Function: It takes input and returns a result without modifying external state.
     query = "DELETE FROM tasks WHERE ID=?"
     params = (task_id,)
     execute_query(conn, query, params, commit=True)
 
 # Function to fetch all tasks with joined information
 def get_all_tasks_with_info(conn):
+    # Pure Function: It takes input and returns a result without modifying external state.
     query = """
     SELECT tasks.ID, tasks.task_name, category.category, tasks.date_time, priority.Level
     FROM tasks
@@ -47,26 +51,31 @@ def get_all_tasks_with_info(conn):
     JOIN priority ON tasks.priority = priority.prioID
     """
     tasks = execute_query(conn, query)
+    # Immutability: Creating a new list without modifying the existing 'tasks' list.
     formatted_tasks = [(task[0], task[1], task[2], datetime.strptime(task[3], "%Y-%m-%dT%H:%M").strftime("%Y-%m-%d %I:%M %p"), task[4]) for task in tasks]
     return formatted_tasks
 
 # Function to fetch all categories
 def get_all_categories(conn):
+    # Pure Function: It takes input and returns a result without modifying external state.
     query = "SELECT catID, category FROM category"
     categories = execute_query(conn, query)
     return [category[1] for category in categories]
 
 # Function to fetch all priorities
 def get_all_priorities(conn):
+    # Pure Function: It takes input and returns a result without modifying external state.
     query = "SELECT prioID, Level FROM priority"
     priorities = execute_query(conn, query)
     return [priority[1] for priority in priorities]
 
 # Function to insert a new task with category and priority
 def insert_task_with_category_priority(conn, task_name, category, date_time, priority):
+    # Higher-Order Function: It takes functions as arguments or returns functions.
     existing_category = execute_query(conn, "SELECT catID FROM category WHERE category=?", (category,))
 
     if not existing_category:
+        # Avoidance of Mutable State: Creating a new category without modifying existing state.
         execute_query(conn, "INSERT INTO category (category) VALUES (?)", (category,), commit=True)
 
     catID = execute_query(conn, "SELECT catID FROM category WHERE category=?", (category,))[0][0]
@@ -78,20 +87,24 @@ def insert_task_with_category_priority(conn, task_name, category, date_time, pri
 
 # Function to delete a category
 def delete_category(conn, category):
+    # Higher-Order Function: It takes functions as arguments or returns functions.
     execute_query(conn, "DELETE FROM category WHERE category=?", (category,), commit=True)
 
 # Helper function for common request processing
 def process_request(request, *args):
+    # First-Class Function: Treating functions as first-class citizens, passing them as arguments.
     if request.method == 'POST':
         return args + tuple(request.form[arg] for arg in args)
     return args
 
 # Function to handle database transactions
 def transaction_handler(conn, query, params=(), commit=False):
+    # First-Class Function: Treating functions as first-class citizens, returning a function.
     return lambda conn: execute_query(conn, query, params, commit)
 
 # Function to compose multiple functions
 def compose(*functions):
+    # Higher-Order Function: It takes functions as arguments or returns functions.
     return lambda x: reduce(lambda v, f: f(v), functions, x)
 
 # Flask routes
