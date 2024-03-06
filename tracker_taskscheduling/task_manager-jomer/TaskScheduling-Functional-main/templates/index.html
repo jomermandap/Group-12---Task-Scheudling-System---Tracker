@@ -438,18 +438,23 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Assuming Bootstrap is included in your project -->
-
     <script>
       // JavaScript function to add new category to the table
+      // Higher-Order Function (due to the callback parameter)
+      // Avoidance of Mutable State (newCategoryInput.value and timeCell.textContent)
+      // Declarative Style (describes what to do, not how to do it)
       const addNewCategory = () => {
+        // Get the new category input element
         const newCategoryInput = document.getElementsByName("new_category")[0];
         const newCategoryValue = newCategoryInput.value.trim();
 
+        // Check if the new category value is not empty
         if (newCategoryValue) {
+          // Get the category select dropdown
           const categorySelect = document.getElementsByName("category")[0];
           const options = Array.from(categorySelect.options);
 
+          // Check if the new category already exists in the options
           if (!options.some((option) => option.value === newCategoryValue)) {
             // Create a new option and add it to the select dropdown
             const newOption = document.createElement("option");
@@ -469,8 +474,9 @@
         }
       };
 
+      // Function to save the new category to the database using AJAX
+      // Higher-Order Function (due to the callback parameter)
       const saveNewCategoryToDatabase = (newCategoryValue, callback) => {
-        // Use AJAX to send a POST request to your Flask route to save the new category
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/add_category", true);
         xhr.setRequestHeader(
@@ -488,6 +494,7 @@
       };
 
       // Function to convert time to 12-hour format
+      // Pure Function (no side effects, same input always produces the same output)
       const formatTime = (timeString) => {
         const [hours, minutes] = timeString.split(":");
         const formattedHours = parseInt(hours) % 12 || 12;
@@ -500,6 +507,7 @@
         const timeCells = document.querySelectorAll(
           "tbody td:nth-child(4) span"
         );
+        // Higher-Order Function (forEach takes a function as an argument)
         timeCells.forEach((timeCell) => {
           const originalTime = timeCell.textContent;
           timeCell.textContent = formatTime(originalTime);
@@ -507,6 +515,7 @@
       });
 
       // Function to open the add task modal
+      // First-Class Function (can be assigned to a variable, passed as an argument)
       const openAddTaskModal = () => {
         const addTaskModal = new bootstrap.Modal(
           document.getElementById("addTaskModal")
@@ -515,6 +524,7 @@
       };
 
       // Function to open the add category modal
+      // First-Class Function (can be assigned to a variable, passed as an argument)
       const openAddCategoryModal = () => {
         const addCategoryModal = new bootstrap.Modal(
           document.getElementById("addCategoryModal")
@@ -523,6 +533,7 @@
       };
 
       // Function to open the edit task modal
+      // First-Class Function (can be assigned to a variable, passed as an argument)
       const openEditTaskModal = (taskId) => {
         const editTaskModal = new bootstrap.Modal(
           document.getElementById("editTaskModal")
@@ -532,6 +543,7 @@
       };
 
       // JavaScript function to delete a category
+      // Avoidance of Mutable State (selectedCategory)
       const deleteCategory = () => {
         const deleteCategorySelect =
           document.getElementsByName("delete_category")[0];
